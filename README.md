@@ -1,0 +1,1 @@
+# inflow [![Build Status](https://travis-ci.org/Amareis/inflow.svg?branch=master)](https://travis-ci.org/Amareis/inflow)
