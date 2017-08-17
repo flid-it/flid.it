@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import {centerGameObjects} from '../utils'
 
-import mushroom from 'assets/images/mushroom2.png'
+import node from 'assets/images/node.png'
 
 export default class extends Phaser.State {
     init() {
@@ -13,10 +13,8 @@ export default class extends Phaser.State {
         centerGameObjects([this.loaderBg, this.loaderBar])
 
         this.load.setPreloadSprite(this.loaderBar)
-        //
-        // load your assets
-        //
-        this.load.image('mushroom', mushroom)
+
+        this.load.image('node', node)
     }
 
     create() {

@@ -1,8 +1,10 @@
-/* globals __DEV__ */
-import Phaser from 'phaser'
-import Mushroom from '../sprites/Mushroom'
+import Phaser, {Point} from 'phaser'
+import Node from '../sprites/Node'
+import {rand} from '../utils'
 
 export default class extends Phaser.State {
+    scaleFactor = 1
+
     init() {
     }
 
@@ -10,28 +12,65 @@ export default class extends Phaser.State {
     }
 
     create() {
-        const bannerText = 'Phaser + ES6 + Webpack'
-        let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
-        banner.font = 'Bangers'
-        banner.padding.set(10, 16)
-        banner.fontSize = 40
-        banner.fill = '#77BFA3'
-        banner.smoothed = false
-        banner.anchor.setTo(0.5)
+        this.game.input.mouse.mouseWheelCallback = ::this.onScroll
+        this.game.stage.backgroundColor = '#222'
+        this.game.camera.bounds = null
 
-        this.mushroom = new Mushroom({
-            game: this.game,
-            x: this.world.centerX,
-            y: this.world.centerY,
-            asset: 'mushroom'
-        })
+        this.nodes = []
 
-        this.game.add.existing(this.mushroom)
+        for (; this.nodes.length < 100;) {
+            let x = rand.integer(-1000, 1000)
+            let y = rand.integer(-1000, 1000)
+
+            let p = new Point(x, y)
+            let fail = false
+            for (let n of this.nodes) {
+                if (Point.distance(n.position, p) < 100) {
+                    fail = true
+                    break
+                }
+            }
+            if (fail)
+                continue
+
+            let node = new Node({game: this.game, x: x, y: y})
+            this.game.add.existing(node)
+            this.nodes.push(node)
+        }
+    }
+
+    update() {
+        this.checkScroll(this.game.camera)
+        this.checkPan(this.game.camera)
     }
 
     render() {
-        if (__DEV__) {
-            this.game.debug.spriteInfo(this.mushroom, 32, 32)
+    }
+
+    checkScroll(camera) {
+        if (this.prevScale && this.prevScale !== this.scaleFactor)
+            camera.scale.set(this.scaleFactor)
+        this.prevScale = this.scaleFactor
+    }
+
+    checkPan(camera) {
+        let pointer = this.game.input.activePointer
+        if (pointer.isDown) {
+            if (this.origDragPoint) {
+                camera.x += this.origDragPoint.x - pointer.position.x
+                camera.y += this.origDragPoint.y - pointer.position.y
+            }
+            this.origDragPoint = pointer.position.clone()
         }
+        else {
+            delete this.origDragPoint
+        }
+    }
+
+    onScroll() {
+        let delta = this.game.input.mouse.wheelDelta * 0.05
+        console.log(this.scaleFactor)
+        if (this.scaleFactor + delta > 0.05 && this.scaleFactor + delta < 3)
+            this.scaleFactor += delta
     }
 }

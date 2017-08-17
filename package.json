@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "phaser": "^2.6.2",
+    "random-js": "^1.0.8",
     "webfontloader": "^1.6.28"
   }
 }

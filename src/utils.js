@@ -3,3 +3,5 @@ export const centerGameObjects = (objects) => {
         object.anchor.setTo(0.5)
     })
 }
+
+export const rand = require('random-js')()
