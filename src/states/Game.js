@@ -1,7 +1,10 @@
-import Phaser, {Point} from 'phaser'
-import Node from '../sprites/Node'
+import Phaser from 'phaser'
+import {rand, getNearestNodes} from '../utils'
+
 import CameraHelper from '../objects/CameraHelper'
-import {rand} from '../utils'
+
+import Node from '../sprites/Node'
+import Link from '../sprites/Link'
 
 export default class extends Phaser.State {
     init() {
@@ -14,33 +17,45 @@ export default class extends Phaser.State {
         this.game.stage.backgroundColor = '#222'
         this.game.add.existing(new CameraHelper(this.game))
 
-        this.nodes = []
+        this.nodes = this.genNodes()
+        this.links = this.genLinks(this.nodes)
 
-        for (; this.nodes.length < 100;) {
+        this.links.forEach(::this.game.add.existing)
+        this.nodes.forEach(::this.game.add.existing)
+    }
+
+    genNodes() {
+        let nodes = []
+        while (nodes.length < 100) {
             let x = rand.integer(-1000, 1000)
             let y = rand.integer(-1000, 1000)
 
-            let p = new Point(x, y)
-            let fail = false
-            for (let n of this.nodes) {
-                if (Point.distance(n.position, p) < 100) {
-                    fail = true
-                    break
-                }
-            }
-            if (fail)
+            if (getNearestNodes(x, y, nodes, 1, -100).length)
                 continue
 
-            let node = new Node({game: this.game, x: x, y: y})
-            this.game.add.existing(node)
-            this.nodes.push(node)
+            let node = new Node(this.game, x, y)
+            nodes.push(node)
         }
+        return nodes
     }
+
+    genLinks(nodes) {
+        let res = []
+        for (let node of nodes) {
+            let linksCount = rand.integer(2, 5) + 1
+            res = res.concat(node.getNearest(nodes, linksCount)
+                .splice(1)
+                .filter(n => !node.linkedWith(n))
+                .map(n => new Link(this.game, node, n)))
+        }
+        return res
+    }
+
+
 
     update() {
     }
 
     render() {
-        //game.debug.cameraInfo(game.camera, 32, 32);
     }
 }
