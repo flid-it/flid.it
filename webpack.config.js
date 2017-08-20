@@ -20,7 +20,7 @@ module.exports = {
         ],
         vendor: ['pixi', 'p2', 'phaser', 'webfontloader']
     },
-    devtool: 'cheap-source-map',
+    devtool: 'eval-source-map',
     output: {
         pathinfo: true,
         path: path.resolve(__dirname, 'dist'),

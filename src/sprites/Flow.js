@@ -42,13 +42,13 @@ export default class Flow extends Phaser.Text {
     postUpdate() {
         let r = rand.shuffle([...this.sends])
         for (let send of r) {
-            let d = send.amount * this.game.time.physicsElapsed
-            if (this.flow >= d) {
-                this.flow -= d
-                if (this.obj instanceof Link)
-                    d *= this.obj.size
-                send.obj.flow.inflow += d
-            }
+            let d = Math.min(send.amount * this.game.time.physicsElapsed, this.flow)
+            this.flow -= d
+            if (this.obj instanceof Link)
+                d *= this.obj.size
+            send.obj.flow.inflow += d
+            if (!this.flow)
+                break
         }
     }
 
