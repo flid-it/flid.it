@@ -22,7 +22,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js'
+        filename: 'bundle.[chunkhash].js'
     },
     plugins: [
         definePlugin,
@@ -34,7 +34,7 @@ module.exports = {
                 comments: false
             }
         }),
-        new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.js'}),
+        new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.[chunkhash].js'}),
         new HtmlWebpackPlugin({template: 'src/index.html', inject: true}),
     ],
     module: {
