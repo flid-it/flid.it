@@ -5,6 +5,7 @@ import CameraHelper from '../objects/CameraHelper'
 
 import Node from '../sprites/Node'
 import Link from '../sprites/Link'
+import Flow from '../sprites/Flow'
 
 export default class extends Phaser.State {
     init() {
@@ -17,16 +18,18 @@ export default class extends Phaser.State {
         this.game.stage.backgroundColor = '#222'
         this.game.add.existing(new CameraHelper(this.game))
 
-        this.nodes = this.genNodes()
+        this.nodes = this.genNodes(100)
         this.links = this.genLinks(this.nodes)
+        this.flows = this.nodes.concat(this.links).map(a => new Flow(this.game, a))
 
         this.links.forEach(::this.game.add.existing)
         this.nodes.forEach(::this.game.add.existing)
+        this.flows.forEach(::this.game.add.existing)
     }
 
-    genNodes() {
+    genNodes(n) {
         let nodes = []
-        while (nodes.length < 100) {
+        while (nodes.length < n) {
             let x = rand.integer(-1000, 1000)
             let y = rand.integer(-1000, 1000)
 

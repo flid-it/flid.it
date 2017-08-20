@@ -4,14 +4,23 @@ import {rand, getNearestNodes} from '../utils'
 export default class Node extends Phaser.Sprite {
     static nodes = []
 
+    size = rand.real(0.5, 1.5)
     rotateSpeed = rand.real(-0.3, 0.3)
     linked = []
+    links = []
+    flow = null
 
     constructor(game, x, y) {
         super(game, x, y, 'node')
-        this.anchor.setTo(0.5)
+        this.anchor.set(0.5)
         this.width = this.height = 32
-        this.scale.set(this.scale.x * rand.real(0.5, 1.5))
+        this.scale.set(this.scale.x * this.size)
+        this.inputEnabled = true
+        this.events.onInputDown.add(::this.onClick)
+    }
+
+    toString() {
+        return 'Node'
     }
 
     update() {
@@ -22,11 +31,18 @@ export default class Node extends Phaser.Sprite {
         return getNearestNodes(this.x, this.y, nodes, n)
     }
 
-    addLinkTo(node) {
-        return this.linked.push(node)
+    link(node, link) {
+        this.linked.push(node)
+        this.links.push(link)
     }
 
     linkedWith(node) {
         return this.linked.includes(node)
+    }
+
+    onClick() {
+        let link = rand.pick(this.links)
+        if (this.flow.canSend(link, 0.1))
+            this.flow.send(link, 0.1)
     }
 }

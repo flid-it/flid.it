@@ -1,25 +1,37 @@
-import Phaser from 'phaser'
+import Phaser, {Point} from 'phaser'
 import {rand} from '../utils'
 
 export default class Link extends Phaser.Graphics {
-    quality = rand.real(0.1, 0.9)
+    size = rand.real(0.1, 0.9)
+    flow = null
 
     constructor(game, node1, node2) {
-        super(game)
+        let center = Point.centroid([node1.position, node2.position])
+        super(game, center.x, center.y)
 
         this.n1 = node1
         this.n2 = node2
 
-        node1.addLinkTo(node2)
-        node2.addLinkTo(node1)
-        
+        node1.link(node2, this)
+        node2.link(node1, this)
+
+        this.alpha = this.size
+
         this.lineStyle(1, 0x0088FF, 1)
         this.beginFill()
-        this.moveTo(this.n1.x, this.n1.y)
-        this.lineTo(this.n2.x, this.n2.y)
+        this.moveTo(this.x - this.n1.x, this.y - this.n1.y)
+        this.lineTo(this.x - this.n2.x, this.y - this.n2.y)
         this.endFill()
     }
 
+    toString() {
+        return 'Link'
+    }
+
     update() {
+    }
+
+    second(first) {
+        return this.n1 === first ? this.n2 : this.n1
     }
 }
