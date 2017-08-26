@@ -4,14 +4,16 @@ import {rand, getNearestNodes} from '../utils'
 export default class Node extends Phaser.Sprite {
     static nodes = []
 
-    size = rand.real(0.5, 1.5)
+    size = 1
     rotateSpeed = rand.real(-0.3, 0.3)
     linked = []
     links = []
     flow = null
 
-    constructor(game, x, y) {
+    constructor(game, x, y, size) {
         super(game, x, y, 'node')
+        this.size = size
+
         this.anchor.set(0.5)
         this.width = this.height = 32
         this.scale.set(this.scale.x * this.size)

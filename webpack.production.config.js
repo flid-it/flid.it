@@ -8,7 +8,8 @@ let pixi = path.join(phaserModule, 'build/custom/pixi.js')
 let p2 = path.join(phaserModule, 'build/custom/p2.js')
 
 let definePlugin = new webpack.DefinePlugin({
-    __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'false'))
+    __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'false')),
+    WEBSOCKET_URL: "\"wss://inflow-server.herokuapp.com/\"",
 })
 
 module.exports = {

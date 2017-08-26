@@ -9,7 +9,8 @@ let pixi = path.join(phaserModule, 'build/custom/pixi.js')
 let p2 = path.join(phaserModule, 'build/custom/p2.js')
 
 let definePlugin = new webpack.DefinePlugin({
-    __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'true'))
+    __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'true')),
+    WEBSOCKET_URL: "\"ws://localhost:3003\""
 })
 
 module.exports = {
@@ -20,7 +21,7 @@ module.exports = {
         ],
         vendor: ['pixi', 'p2', 'phaser', 'webfontloader']
     },
-    devtool: 'eval-source-map',
+    devtool: 'source-map',
     output: {
         pathinfo: true,
         path: path.resolve(__dirname, 'dist'),

@@ -8,6 +8,10 @@ import Link from '../sprites/Link'
 import Flow from '../sprites/Flow'
 
 export default class extends Phaser.State {
+    nodes = []
+    links = []
+    flows = []
+
     init() {
     }
 
@@ -18,13 +22,33 @@ export default class extends Phaser.State {
         this.game.stage.backgroundColor = '#222'
         this.game.add.existing(new CameraHelper(this.game))
 
-        this.nodes = this.genNodes(100)
-        this.links = this.genLinks(this.nodes)
-        this.flows = this.nodes.concat(this.links).map(a => new Flow(this.game, a))
 
-        this.links.forEach(::this.game.add.existing)
-        this.nodes.forEach(::this.game.add.existing)
-        this.flows.forEach(::this.game.add.existing)
+        this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+        this.ws = new WebSocket(WEBSOCKET_URL)
+        this.ws.onmessage = mes => {
+            mes = JSON.parse(mes.data)
+            console.log(mes)
+
+            switch (mes.type) {
+                case 'SetPlayer':
+                    this.ws.send(JSON.stringify({type: 'GetState', id: mes.id}))
+                    break
+                case 'GameState':
+                    this.links.concat(this.nodes).concat(this.flows).forEach(a => a.destroy())
+
+                    this.nodes = mes.nodes.map(n => new Node(this.game, n.pos.x, n.pos.y, n.size))
+                    this.links = this.genLinks(this.nodes)
+                    this.flows = this.nodes.concat(this.links).map(a => new Flow(this.game, a))
+
+                    this.links.forEach(::this.game.add.existing)
+                    this.nodes.forEach(::this.game.add.existing)
+                    this.flows.forEach(::this.game.add.existing)
+
+                    this.canRegen = true
+                    break
+            }
+        }
     }
 
     genNodes(n) {
@@ -54,9 +78,11 @@ export default class extends Phaser.State {
         return res
     }
 
-
-
     update() {
+        if (this.canRegen && this.space.isDown) {
+            this.canRegen = false
+            this.ws.send(JSON.stringify({type: 'Restart'}))
+        }
     }
 
     render() {
