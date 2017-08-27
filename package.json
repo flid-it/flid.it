@@ -1,8 +1,8 @@
 {
-  "name": "inflow",
+  "name": "flowfield",
   "version": "0.0.1",
-  "description": "info+flow",
-  "repository": "https://github.com/Amareis/inflow.git",
+  "description": "Flowfield frontend",
+  "repository": "https://github.com/flowfield/flowfield.git",
   "main": "index.js",
   "scripts": {
     "test": "jest",

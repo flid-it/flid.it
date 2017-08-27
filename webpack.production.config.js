@@ -9,7 +9,7 @@ let p2 = path.join(phaserModule, 'build/custom/p2.js')
 
 let definePlugin = new webpack.DefinePlugin({
     __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'false')),
-    WEBSOCKET_URL: "\"wss://inflow-server.herokuapp.com/\"",
+    WEBSOCKET_URL: "\"wss://ff-server.herokuapp.com/\"",
 })
 
 module.exports = {

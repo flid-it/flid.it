@@ -1,5 +1,5 @@
 export default {
     gameWidth: 1000,
     gameHeight: 600,
-    localStorageName: 'inflow'
+    localStorageName: 'flowfield'
 }
