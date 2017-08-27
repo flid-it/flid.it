@@ -35,7 +35,7 @@ export default class extends Phaser.State {
 
                     this.nodes = mes.nodes.map(n => new Node(this.game, n.id, n.pos.x, n.pos.y, n.size))
                     this.links = mes.links.map(l =>
-                        new Link(this.game, l.id, this.getNode(l.n1), this.getNode(l.n2)))
+                        new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
                     this.flows = this.nodes.concat(this.links).map(a => new Flow(this.game, a))
 
                     this.links.concat(this.nodes).concat(this.flows).forEach(::this.game.add.existing)

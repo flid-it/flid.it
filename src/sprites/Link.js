@@ -2,14 +2,14 @@ import Phaser, {Point} from 'phaser'
 import {rand} from '../utils'
 
 export default class Link extends Phaser.Graphics {
-    size = rand.real(0.1, 0.9)
     flow = null
 
-    constructor(game, id, node1, node2) {
+    constructor(game, id, quality, node1, node2) {
         let center = Point.centroid([node1.position, node2.position])
         super(game, center.x, center.y)
 
         this.id = id
+        this.size = quality
         this.n1 = node1
         this.n2 = node2
 
