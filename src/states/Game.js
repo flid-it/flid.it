@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import {rand, getNearestNodes} from '../utils'
 
 import CameraHelper from '../objects/CameraHelper'
 
@@ -36,7 +35,16 @@ export default class extends Phaser.State {
                     this.nodes = mes.nodes.map(n => new Node(this.game, n.id, n.pos.x, n.pos.y, n.size))
                     this.links = mes.links.map(l =>
                         new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
-                    this.flows = this.nodes.concat(this.links).map(a => new Flow(this.game, a))
+                    this.flows = mes.flows.map(f =>
+                        new Flow(
+                            this.game,
+                            f.id,
+                            f.amount,
+                            f.host.Node !== undefined
+                                ? this.getNode(f.host.Node)
+                                : this.getLink(f.host.Link)
+                        )
+                    )
 
                     this.links.concat(this.nodes).concat(this.flows).forEach(::this.game.add.existing)
 
@@ -47,6 +55,8 @@ export default class extends Phaser.State {
     }
 
     getNode = id => this.nodes.find(n => n.id === id)
+    getLink = id => this.links.find(l => l.id === id)
+    getFlow = id => this.flows.find(f => f.id === id)
 
     update() {
         if (this.canRegen && this.space.isDown) {
