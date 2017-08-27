@@ -10,8 +10,9 @@ export default class Node extends Phaser.Sprite {
     links = []
     flow = null
 
-    constructor(game, x, y, size) {
+    constructor(game, id, x, y, size) {
         super(game, x, y, 'node')
+        this.id = id
         this.size = size
 
         this.anchor.set(0.5)
