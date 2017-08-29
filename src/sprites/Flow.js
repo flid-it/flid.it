@@ -28,7 +28,7 @@ export default class Flow extends Phaser.Text {
         this.amount += this.inflow
         this.inflow = 0
         if (this.host instanceof Node)
-            this.amount += this.host.size * this.game.time.physicsElapsed
+            this.amount += this.host.size * this.game.time.elapsed / 1000
     }
 
     update(){
@@ -36,14 +36,14 @@ export default class Flow extends Phaser.Text {
             this.text = this.amount.toFixed(1)
         }
         if (this.host instanceof Link) {
-            this.text = (this.amount / this.game.time.physicsElapsed).toFixed(1)
+            this.text = (this.amount / this.game.time.elapsed / 1000).toFixed(1)
         }
     }
 
     postUpdate() {
         let r = rand.shuffle([...this.sends])
         for (let send of r) {
-            let d = Math.min(send.amount * this.game.time.physicsElapsed, this.amount)
+            let d = Math.min(send.amount * this.game.time.elapsed / 1000, this.amount)
             this.amount -= d
             if (this.host instanceof Link)
                 d *= this.host.size
