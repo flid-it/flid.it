@@ -21,7 +21,8 @@ export default class extends Phaser.State {
         this.game.stage.backgroundColor = '#222'
         this.game.add.existing(new CameraHelper(this.game))
 
-        this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
+        this.enter = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
 
         this.ws = new WebSocket(WEBSOCKET_URL)
         this.ws.onmessage = mes => {
@@ -30,24 +31,20 @@ export default class extends Phaser.State {
 
             switch (mes.type) {
                 case 'GameState':
-                    this.links.concat(this.nodes).concat(this.flows).forEach(a => a.destroy())
+                    this.links.concat(this.nodes).forEach(a => a.destroy())
 
                     this.nodes = mes.nodes.map(n => new Node(this.game, n.id, n.pos.x, n.pos.y, n.size))
                     this.links = mes.links.map(l =>
                         new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
-                    this.flows = mes.flows.map(f =>
-                        new Flow(
-                            this.game,
-                            f.id,
-                            f.amount,
-                            f.host.Node !== undefined
-                                ? this.getNode(f.host.Node)
-                                : this.getLink(f.host.Link)
-                        )
-                    )
 
-                    this.links.concat(this.nodes).concat(this.flows).forEach(::this.game.add.existing)
+                    this.links.concat(this.nodes).forEach(::this.game.add.existing)
 
+                    this.makeFlows(mes.flows)
+
+                    this.canRegen = true
+                    break
+                case 'FlowState':
+                    this.makeFlows(mes.flows)
                     this.canRegen = true
                     break
             }
@@ -58,10 +55,29 @@ export default class extends Phaser.State {
     getLink = id => this.links.find(l => l.id === id)
     getFlow = id => this.flows.find(f => f.id === id)
 
+    makeFlows(flows) {
+        this.flows.forEach(a => a.destroy())
+        this.flows = flows.map(f =>
+            new Flow(
+                this.game,
+                f.id,
+                f.amount,
+                f.host.Node !== undefined
+                    ? this.getNode(f.host.Node)
+                    : this.getLink(f.host.Link)
+            )
+        )
+        this.flows.forEach(::this.game.add.existing)
+    }
+
     update() {
         if (this.canRegen && this.space.isDown) {
             this.canRegen = false
             this.ws.send(JSON.stringify({type: 'Restart'}))
+        }
+        if (this.canRegen && this.enter.isDown) {
+            this.canRegen = false
+            this.ws.send(JSON.stringify({type: 'Calc'}))
         }
     }
 
