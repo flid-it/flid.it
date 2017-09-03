@@ -1,1 +1,1 @@
-# flowfield [![Build Status](https://travis-ci.org/flowfield/flowfield.svg?branch=master)](https://travis-ci.org/flowfield/flowfield)
+# flid.it [![Build Status](https://travis-ci.org/flid-it/flid.it.svg?branch=master)](https://travis-ci.org/flid-it/flid.it)

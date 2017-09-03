@@ -1,8 +1,8 @@
 {
-  "name": "flowfield",
+  "name": "flid.it",
   "version": "0.0.1",
-  "description": "Flowfield frontend",
-  "repository": "https://github.com/flowfield/flowfield.git",
+  "description": "flid.it frontend",
+  "repository": "https://github.com/flid-it/flid.it.git",
   "main": "index.js",
   "scripts": {
     "test": "jest",
