@@ -1,4 +1,4 @@
-import {rand} from '../utils'
+//import {rand} from '../utils'
 
 import Phaser from 'phaser'
 import Node from './Node'
@@ -11,7 +11,7 @@ export default class Flow extends Phaser.Text {
     sends = []
 
     constructor(game, id, amount, host) {
-        super(game, host.x, host.y, amount.toString(), {font: '12pt Arial', fill: 'red'})
+        super(game, host.x, host.y, amount.toFixed(1), {font: '12pt Arial', fill: 'red'})
         this.id = id
         this.amount = amount
         this.host = host
@@ -25,32 +25,33 @@ export default class Flow extends Phaser.Text {
     }
 
     preUpdate() {
-        this.amount += this.inflow
+        /*this.amount += this.inflow
         this.inflow = 0
         if (this.host instanceof Node)
-            this.amount += this.host.size * this.game.time.elapsed / 1000
+            this.amount += this.host.size * this.game.time.elapsed / 1000*/
     }
 
     update(){
-        if (this.host instanceof Node) {
+        this.text = this.amount.toFixed(1)
+        /*if (this.host instanceof Node) {
             this.text = this.amount.toFixed(1)
         }
         if (this.host instanceof Link) {
-            this.text = (this.amount / this.game.time.elapsed / 1000).toFixed(1)
-        }
+            this.text = (this.amount / (this.game.time.elapsed / 1000)).toFixed(1)
+        }*/
     }
 
     postUpdate() {
-        let r = rand.shuffle([...this.sends])
+        /*let r = rand.shuffle([...this.sends])
         for (let send of r) {
             let d = Math.min(send.amount * this.game.time.elapsed / 1000, this.amount)
             this.amount -= d
             if (this.host instanceof Link)
                 d *= this.host.size
-            send.host.flow.inflow += d
+            send.obj.flow.inflow += d
             if (!this.amount)
                 break
-        }
+        }*/
     }
 
     canSend(toObj, amount) {
@@ -61,7 +62,7 @@ export default class Flow extends Phaser.Text {
         if (!this.canSend(toObj, amount))
             throw new Error(`Cannot send ${amount} flow to ${toObj}`)
 
-        let s = this.sends.find(s => s.host === toObj)
+        let s = this.sends.find(s => s.obj === toObj)
         if (s)
             s.amount += amount
         else
@@ -74,7 +75,7 @@ export default class Flow extends Phaser.Text {
         if (this.host instanceof Node)
             return true
         if (this.host instanceof Link)
-            return this.sends.length === 0 || this.sends[0].host !== fromObj
+            return this.sends.length === 0 || this.sends[0].obj === this.host.second(fromObj)
     }
 
     receive(fromObj, amount) {

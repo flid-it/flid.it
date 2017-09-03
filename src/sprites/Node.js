@@ -10,8 +10,9 @@ export default class Node extends Phaser.Sprite {
     links = []
     flow = null
 
-    constructor(game, id, x, y, size) {
+    constructor(game, send, id, x, y, size) {
         super(game, x, y, 'node')
+        this.send = send
         this.id = id
         this.size = size
 
@@ -45,7 +46,10 @@ export default class Node extends Phaser.Sprite {
 
     onClick() {
         let link = rand.pick(this.links)
-        if (this.flow.canSend(link, 0.1))
-            this.flow.send(link, 0.1)
+        /*if (this.flow.canSend(link, 0.1))
+            this.flow.send(link, 0.1)*/
+        let flow_id = link.flow.id
+        let dir = this === link.n1 ? 'To2' : 'To1'
+        this.send('ChangeFlow', {flow_id, dir})
     }
 }

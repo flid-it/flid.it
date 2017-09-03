@@ -17,38 +17,45 @@ export default class extends Phaser.State {
     preload() {
     }
 
+    send(type, obj={}) {
+        this.ws.send(JSON.stringify({type, ...obj}))
+    }
+
+    onMessage(mes) {
+        mes = JSON.parse(mes.data)
+        //console.log(mes)
+
+        switch (mes.type) {
+            case 'GameState':
+                this.links.concat(this.nodes).forEach(a => a.destroy())
+
+                this.nodes = mes.nodes.map(n => new Node(this.game, ::this.send, n.id, n.pos.x, n.pos.y, n.size))
+                this.links = mes.links.map(l =>
+                    new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
+
+                this.links.concat(this.nodes).forEach(::this.game.add.existing)
+
+                this.makeFlows(mes.flows)
+
+                this.canRegen = true
+                this.send('Calc')
+                break
+            case 'FlowState':
+                this.makeFlows(mes.flows)
+                this.send('Calc')
+                break
+            //TODO FlowUpdate
+        }
+    }
+
     create() {
         this.game.stage.backgroundColor = '#222'
         this.game.add.existing(new CameraHelper(this.game))
 
         this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
-        this.enter = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
 
         this.ws = new WebSocket(WEBSOCKET_URL)
-        this.ws.onmessage = mes => {
-            mes = JSON.parse(mes.data)
-            console.log(mes)
-
-            switch (mes.type) {
-                case 'GameState':
-                    this.links.concat(this.nodes).forEach(a => a.destroy())
-
-                    this.nodes = mes.nodes.map(n => new Node(this.game, n.id, n.pos.x, n.pos.y, n.size))
-                    this.links = mes.links.map(l =>
-                        new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
-
-                    this.links.concat(this.nodes).forEach(::this.game.add.existing)
-
-                    this.makeFlows(mes.flows)
-
-                    this.canRegen = true
-                    break
-                case 'FlowState':
-                    this.makeFlows(mes.flows)
-                    this.canRegen = true
-                    break
-            }
-        }
+        this.ws.onmessage = ::this.onMessage
     }
 
     getNode = id => this.nodes.find(n => n.id === id)
@@ -64,7 +71,7 @@ export default class extends Phaser.State {
                 f.amount,
                 f.host.Node !== undefined
                     ? this.getNode(f.host.Node)
-                    : this.getLink(f.host.Link)
+                    : this.getLink(f.host.Link.id)
             )
         )
         this.flows.forEach(::this.game.add.existing)
@@ -73,11 +80,7 @@ export default class extends Phaser.State {
     update() {
         if (this.canRegen && this.space.isDown) {
             this.canRegen = false
-            this.ws.send(JSON.stringify({type: 'Restart'}))
-        }
-        if (this.canRegen && this.enter.isDown) {
-            this.canRegen = false
-            this.ws.send(JSON.stringify({type: 'Calc'}))
+            this.send('Restart')
         }
     }
 
