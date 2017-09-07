@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import Node from '../sprites/Node'
 
 export default class extends Phaser.Sprite {
     scaleFactor = 1
@@ -31,7 +32,7 @@ export default class extends Phaser.Sprite {
 
     checkPan(point) {
         let pointer = this.game.input.activePointer
-        if (pointer.isDown) {
+        if (pointer.isDown && !Node.selected) {
             if (this.origDragPoint) {
                 point.x += (this.origDragPoint.x - pointer.position.x) / this.scaleFactor
                 point.y += (this.origDragPoint.y - pointer.position.y) / this.scaleFactor

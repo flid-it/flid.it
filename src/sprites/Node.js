@@ -3,6 +3,8 @@ import {rand, getNearestNodes} from '../utils'
 
 export default class Node extends Phaser.Sprite {
     static nodes = []
+    static selected = null
+    static hovered = null
 
     size = 1
     rotateSpeed = rand.real(-0.3, 0.3)
@@ -19,8 +21,13 @@ export default class Node extends Phaser.Sprite {
         this.anchor.set(0.5)
         this.width = this.height = 32
         this.scale.set(this.scale.x * this.size)
+
         this.inputEnabled = true
-        this.events.onInputDown.add(::this.onClick)
+
+        this.events.onInputOver.add(() => Node.hovered = this)
+        this.events.onInputOut.add(() => Node.hovered = null)
+        this.events.onInputDown.add(() => Node.selected = this)
+        this.events.onInputUp.add(::this.onDrop)
     }
 
     toString() {
@@ -44,12 +51,15 @@ export default class Node extends Phaser.Sprite {
         return this.linked.includes(node)
     }
 
-    onClick() {
-        let link = rand.pick(this.links)
-        /*if (this.flow.canSend(link, 0.1))
-            this.flow.send(link, 0.1)*/
-        let flow_id = link.flow.id
-        let dir = this === link.n1 ? 'To2' : 'To1'
-        this.send('ChangeFlow', {flow_id, dir})
+    onDrop() {
+        if (Node.hovered && Node.hovered !== this && this.linked.includes(Node.hovered)) {
+            let link = this.links.find(l => l.second(this) === Node.hovered)
+            /*if (this.flow.canSend(link, 0.1))
+                this.flow.send(link, 0.1)*/
+            let flow_id = link.flow.id
+            let dir = this === link.n1 ? 'To2' : 'To1'
+            this.send('ChangeFlow', {flow_id, dir})
+        }
+        Node.selected = null
     }
 }
