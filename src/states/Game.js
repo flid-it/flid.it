@@ -42,7 +42,6 @@ export default class extends Phaser.State {
                 break
             case 'FlowState':
                 this.makeFlows(mes.flows)
-                this.send('Calc')
                 break
             //TODO FlowUpdate
         }
@@ -56,6 +55,7 @@ export default class extends Phaser.State {
 
         this.ws = new WebSocket(WEBSOCKET_URL)
         this.ws.onmessage = ::this.onMessage
+        setInterval(() => this.send('Calc'), 300)
     }
 
     getNode = id => this.nodes.find(n => n.id === id)
