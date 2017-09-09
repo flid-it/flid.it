@@ -29,9 +29,6 @@ export default class Link extends Phaser.Graphics {
         return 'Link'
     }
 
-    update() {
-    }
-
     second(first) {
         return this.n1 === first ? this.n2 : this.n1
     }

@@ -7,9 +7,9 @@ import Link from '../sprites/Link'
 import Flow from '../sprites/Flow'
 
 export default class extends Phaser.State {
-    nodes = []
-    links = []
-    flows = []
+    nodes = {}
+    links = {}
+    flows = {}
 
     init() {
     }
@@ -27,18 +27,21 @@ export default class extends Phaser.State {
 
         switch (mes.type) {
             case 'GameState':
-                this.links.concat(this.nodes).forEach(a => a.destroy())
+                Object.values(this.links).concat(Object.values(this.nodes)).forEach(a => a.destroy())
+                this.nodes = {}
+                this.links = {}
 
-                this.nodes = mes.nodes.map(n => new Node(this.game, ::this.send, n.id, n.pos.x, n.pos.y, n.size))
-                this.links = mes.links.map(l =>
-                    new Link(this.game, l.id, l.quality, this.getNode(l.n1), this.getNode(l.n2)))
+                for (let n of mes.nodes)
+                    this.nodes[n.id] = new Node(this.game, ::this.send, n.id, n.pos.x, n.pos.y, n.size)
+                for (let l of mes.links)
+                    this.links[l.id] = new Link(this.game, l.id, l.quality, this.nodes[l.n1], this.nodes[l.n2])
 
-                this.links.concat(this.nodes).forEach(::this.game.add.existing)
+                Object.values(this.links).concat(Object.values(this.nodes)).forEach(::this.game.add.existing)
 
                 this.makeFlows(mes.flows)
 
                 this.canRegen = true
-                this.send('Calc')
+                setInterval(() => this.send('Calc'), 300)
                 break
             case 'FlowState':
                 this.makeFlows(mes.flows)
@@ -55,26 +58,32 @@ export default class extends Phaser.State {
 
         this.ws = new WebSocket(WEBSOCKET_URL)
         this.ws.onmessage = ::this.onMessage
-        setInterval(() => this.send('Calc'), 300)
     }
 
-    getNode = id => this.nodes.find(n => n.id === id)
-    getLink = id => this.links.find(l => l.id === id)
-    getFlow = id => this.flows.find(f => f.id === id)
-
     makeFlows(flows) {
-        this.flows.forEach(a => a.destroy())
-        this.flows = flows.map(f =>
-            new Flow(
-                this.game,
-                f.id,
-                f.amount,
-                f.host.Node !== undefined
-                    ? this.getNode(f.host.Node)
-                    : this.getLink(f.host.Link.id)
-            )
-        )
-        this.flows.forEach(::this.game.add.existing)
+        let newFlows = {}
+        for (let f of flows) {
+            let t
+            if (t = this.flows[f.id]) {
+                delete this.flows[f.id]
+                t.amount = f.amount
+            }
+            else {
+                t = new Flow(
+                    this.game,
+                    f.id,
+                    f.amount,
+                    f.host.Node !== undefined
+                        ? this.nodes[f.host.Node]
+                        : this.links[f.host.Link.id]
+                )
+                this.game.add.existing(t)
+            }
+            newFlows[f.id] = t
+        }
+
+        Object.values(this.flows).forEach(f => f.destroy())
+        this.flows = newFlows
     }
 
     update() {

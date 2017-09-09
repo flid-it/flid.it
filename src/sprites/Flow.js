@@ -23,14 +23,14 @@ export default class Flow extends Phaser.Text {
     toString() {
         return `Flow on ${this.host}`
     }
-
+/*
     preUpdate() {
-        /*this.amount += this.inflow
+        this.amount += this.inflow
         this.inflow = 0
         if (this.host instanceof Node)
-            this.amount += this.host.size * this.game.time.elapsed / 1000*/
+            this.amount += this.host.size * this.game.time.elapsed / 1000
     }
-
+*/
     update(){
         this.text = this.amount.toFixed(1)
         /*if (this.host instanceof Node) {
@@ -40,9 +40,9 @@ export default class Flow extends Phaser.Text {
             this.text = (this.amount / (this.game.time.elapsed / 1000)).toFixed(1)
         }*/
     }
-
+/*
     postUpdate() {
-        /*let r = rand.shuffle([...this.sends])
+        let r = rand.shuffle([...this.sends])
         for (let send of r) {
             let d = Math.min(send.amount * this.game.time.elapsed / 1000, this.amount)
             this.amount -= d
@@ -51,9 +51,9 @@ export default class Flow extends Phaser.Text {
             send.obj.flow.inflow += d
             if (!this.amount)
                 break
-        }*/
+        }
     }
-
+*/
     canSend(toObj, amount) {
         return toObj.flow.canReceive(this.host, amount)
     }
