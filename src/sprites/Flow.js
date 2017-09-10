@@ -18,6 +18,8 @@ export default class Flow extends Phaser.Text {
         this.host.flow = this
 
         this.anchor.set(0.5)
+
+        this.flid = this.game.add.graphics(this.x, this.y)
     }
 
     toString() {
@@ -32,7 +34,14 @@ export default class Flow extends Phaser.Text {
     }
 */
     update(){
-        this.text = this.amount.toFixed(1)
+        let newText = this.amount.toFixed(1)
+        if (newText !== this.text && this.host instanceof Link) {
+            this.flid.clear()
+            this.flid.beginFill(0x00ff00, 0.2)
+            this.flid.drawCircle(0, 0, this.amount * 50)
+            this.flid.endFill()
+        }
+        this.text = newText
         /*if (this.host instanceof Node) {
             this.text = this.amount.toFixed(1)
         }

@@ -1,5 +1,4 @@
 import Phaser, {Point} from 'phaser'
-import {rand} from '../utils'
 
 export default class Link extends Phaser.Graphics {
     flow = null
@@ -16,9 +15,9 @@ export default class Link extends Phaser.Graphics {
         node1.link(node2, this)
         node2.link(node1, this)
 
-        this.alpha = this.size
+        //this.alpha = this.size
 
-        this.lineStyle(1, 0x0088FF, 1)
+        this.lineStyle(1, 0x0088FF, this.size)
         this.beginFill()
         this.moveTo(this.x - this.n1.x, this.y - this.n1.y)
         this.lineTo(this.x - this.n2.x, this.y - this.n2.y)
