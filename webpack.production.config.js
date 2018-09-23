@@ -1,7 +1,6 @@
 let path = require('path');
 let webpack = require('webpack')
 let HtmlWebpackPlugin = require('html-webpack-plugin')
-let CopyWebpackPlugin = require('copy-webpack-plugin')
 
 let phaserModule = path.join(__dirname, '/node_modules/phaser/')
 let phaser = path.join(phaserModule, 'build/custom/phaser-split.js')
@@ -38,7 +37,6 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.[chunkhash].js'}),
         new HtmlWebpackPlugin({template: 'src/index.html', inject: true}),
-        new CopyWebpackPlugin([{from: 'src/CNAME'}]),
     ],
     module: {
         rules: [
