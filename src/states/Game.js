@@ -7,6 +7,16 @@ import Link from '../sprites/Link'
 import Flow from '../sprites/Flid'
 
 export default class GameState extends Phaser.State {
+    static dt = 0
+
+    static get time() {
+        return Date.now() / 1000 + GameState.dt
+    }
+
+    static set time(time) {
+        GameState.dt = time - Date.now() / 1000
+    }
+
     myId = null
 
     nodes = {}
@@ -30,11 +40,14 @@ export default class GameState extends Phaser.State {
         switch (mes.type) {
             case 'Hello':
                 this.myId = mes.id
+                GameState.time = mes.time
                 break
             case 'GameState':
                 Object.values(this.links).concat(Object.values(this.nodes)).forEach(a => a.destroy())
                 this.nodes = {}
                 this.links = {}
+
+                GameState.time = mes.time
 
                 for (let n of mes.nodes)
                     this.nodes[n.id] = new Node(this.game, ::this.send, n.id, n.pos.x, n.pos.y, n.size)
@@ -46,12 +59,13 @@ export default class GameState extends Phaser.State {
                 this.makeFlows(mes.flids)
 
                 this.canRegen = true
-                setInterval(() => this.send('Calc'), 300)
                 break
             case 'FlidState':
                 this.makeFlows(mes.flids)
                 break
-            //TODO FlowUpdate
+            case 'FlidUpdate':
+                this.makeFlows([mes.flid])
+                break
         }
     }
 
@@ -72,15 +86,18 @@ export default class GameState extends Phaser.State {
             let host = f.host.Node !== undefined
                 ? this.nodes[f.host.Node]
                 : this.links[f.host.Link.id]
+            let jump = f.host.Link || null
             if (t) {
                 delete this.flids[f.id]
                 t.host = host
+                t.jump = jump
             }
             else {
                 t = new Flow(
                     this.game,
                     f.id,
                     host,
+                    jump,
                     f.id === this.myId,
                 )
                 this.game.add.existing(t)
