@@ -1,8 +1,6 @@
 import Phaser, {Point} from 'phaser'
 
 export default class Link extends Phaser.Graphics {
-    flow = null
-
     constructor(game, id, quality, node1, node2) {
         let center = Point.centroid([node1.position, node2.position])
         super(game, center.x, center.y)

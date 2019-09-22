@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import {rand, getNearestNodes} from '../utils'
+import Flid from './Flid'
 
 export default class Node extends Phaser.Sprite {
     static nodes = []
@@ -10,7 +11,6 @@ export default class Node extends Phaser.Sprite {
     rotateSpeed = rand.real(-0.3, 0.3)
     linked = []
     links = []
-    flow = null
 
     constructor(game, send, id, x, y, size) {
         super(game, x, y, 'node')
@@ -52,13 +52,10 @@ export default class Node extends Phaser.Sprite {
     }
 
     onDrop() {
-        if (Node.hovered && Node.hovered !== this && this.linked.includes(Node.hovered)) {
-            let link = this.links.find(l => l.second(this) === Node.hovered)
-            /*if (this.flow.canSend(link, 0.1))
-                this.flow.send(link, 0.1)*/
-            let flow_id = link.flow.id
-            let dir = this === link.n1 ? 'To2' : 'To1'
-            this.send('ChangeFlow', {flow_id, dir})
+        if (Node.selected === this) {
+            let link = this.links.find(l => l.second(this) === Flid.me.host)
+            if (link)
+                this.send('Jump', {link_id: link.id})
         }
         Node.selected = null
     }

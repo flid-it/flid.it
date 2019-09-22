@@ -4,12 +4,14 @@ import CameraHelper from '../objects/CameraHelper'
 
 import Node from '../sprites/Node'
 import Link from '../sprites/Link'
-import Flow from '../sprites/Flow'
+import Flow from '../sprites/Flid'
 
-export default class extends Phaser.State {
+export default class GameState extends Phaser.State {
+    myId = null
+
     nodes = {}
     links = {}
-    flows = {}
+    flids = {}
 
     init() {
     }
@@ -26,6 +28,9 @@ export default class extends Phaser.State {
         //console.log(mes)
 
         switch (mes.type) {
+            case 'Hello':
+                this.myId = mes.id
+                break
             case 'GameState':
                 Object.values(this.links).concat(Object.values(this.nodes)).forEach(a => a.destroy())
                 this.nodes = {}
@@ -38,13 +43,13 @@ export default class extends Phaser.State {
 
                 Object.values(this.links).concat(Object.values(this.nodes)).forEach(::this.game.add.existing)
 
-                this.makeFlows(mes.flows)
+                this.makeFlows(mes.flids)
 
                 this.canRegen = true
                 setInterval(() => this.send('Calc'), 300)
                 break
-            case 'FlowState':
-                this.makeFlows(mes.flows)
+            case 'FlidState':
+                this.makeFlows(mes.flids)
                 break
             //TODO FlowUpdate
         }
@@ -63,31 +68,32 @@ export default class extends Phaser.State {
     makeFlows(flows) {
         let newFlows = {}
         for (let f of flows) {
-            let t
-            if (t = this.flows[f.id]) {
-                delete this.flows[f.id]
-                t.amount = f.amount
+            let t = this.flids[f.id]
+            let host = f.host.Node !== undefined
+                ? this.nodes[f.host.Node]
+                : this.links[f.host.Link.id]
+            if (t) {
+                delete this.flids[f.id]
+                t.host = host
             }
             else {
                 t = new Flow(
                     this.game,
                     f.id,
-                    f.amount,
-                    f.host.Node !== undefined
-                        ? this.nodes[f.host.Node]
-                        : this.links[f.host.Link.id]
+                    host,
+                    f.id === this.myId,
                 )
                 this.game.add.existing(t)
             }
             newFlows[f.id] = t
         }
 
-        Object.values(this.flows).forEach(f => f.destroy())
-        this.flows = newFlows
+        Object.values(this.flids).forEach(f => f.destroy())
+        this.flids = newFlows
     }
 
     update() {
-        if (this.canRegen && this.space.isDown) {
+        if (this.canRegen && this.space.isDown && window.space) {
             this.canRegen = false
             this.send('Restart')
         }
