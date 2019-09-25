@@ -28,7 +28,8 @@ export default class Flid extends Phaser.Graphics {
                 points.reverse()
             let passed = GameState.time - this.jump.start_at
             let total = this.jump.arrive_at - this.jump.start_at
-            let p = Phaser.Point.interpolate(points[0], points[1], Math.min(passed / total, 1))
+            let f = Math.max(Math.min(passed / total, 1), 0)
+            let p = Phaser.Point.interpolate(points[0], points[1], f)
             this.x = p.x
             this.y = p.y
         }

@@ -70,8 +70,9 @@ export default class GameState extends Phaser.State {
     }
 
     create() {
+        this.camera = new CameraHelper(this.game)
         this.game.stage.backgroundColor = '#222'
-        this.game.add.existing(new CameraHelper(this.game))
+        this.game.add.existing(this.camera)
 
         this.space = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR)
 

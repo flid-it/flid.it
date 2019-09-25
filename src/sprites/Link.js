@@ -13,9 +13,9 @@ export default class Link extends Phaser.Graphics {
         node1.link(node2, this)
         node2.link(node1, this)
 
-        //this.alpha = this.size
-
-        this.lineStyle(1, 0x0088FF, this.size)
+        //let steps = 8
+        let color = 0x00ffff //Phaser.Color.interpolateColor(0x00ff00, 0xff0000, steps, Math.round(this.size*steps))
+        this.lineStyle(1, color, 0.6)
         this.beginFill()
         this.moveTo(this.x - this.n1.x, this.y - this.n1.y)
         this.lineTo(this.x - this.n2.x, this.y - this.n2.y)

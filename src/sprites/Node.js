@@ -1,26 +1,21 @@
 import Phaser from 'phaser'
-import {rand, getNearestNodes} from '../utils'
+import {getNearestNodes} from '../utils'
 import Flid from './Flid'
 
-export default class Node extends Phaser.Sprite {
+export default class Node extends Phaser.Graphics {
     static nodes = []
     static selected = null
     static hovered = null
 
     size = 1
-    rotateSpeed = rand.real(-0.3, 0.3)
     linked = []
     links = []
 
     constructor(game, send, id, x, y, size) {
-        super(game, x, y, 'node')
+        super(game, x, y)
         this.send = send
         this.id = id
         this.size = size
-
-        this.anchor.set(0.5)
-        this.width = this.height = 32
-        this.scale.set(this.scale.x * this.size)
 
         this.inputEnabled = true
 
@@ -28,14 +23,15 @@ export default class Node extends Phaser.Sprite {
         this.events.onInputOut.add(() => Node.hovered = null)
         this.events.onInputDown.add(() => Node.selected = this)
         this.events.onInputUp.add(::this.onDrop)
+
+        this.lineStyle(1, 0xffffff, 1)
+        this.beginFill(0xffffff)
+        this.drawCircle(0, 0, this.size*30)
+        this.endFill()
     }
 
     toString() {
         return 'Node'
-    }
-
-    update() {
-        this.angle += this.rotateSpeed
     }
 
     getNearest(nodes, n=1) {
